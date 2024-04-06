@@ -14,11 +14,13 @@
 - [x] PHP 8.2
 - [x] PHPUnit
 - [x] Laravel Pint
+- [x] PhpMD
 - [x] Laravel Sanctum
 - [x] Laravel Breeze
 
 ### For Frontend
 - [x] Vue 3
+- I couldn't complete the frontend side. I haven't had the opportunity to write much frontend in the last 4 years. I couldn't get out of it.
 
 
 ### 1. Installation
@@ -36,13 +38,21 @@ docker-compose exec backend php artisan key:generate
 docker-compose exec backend php artisan migrate
 ```
 
-### 3. Testing
+### 3. Token create
+```bash
+After creating an account or logging in,
+ you can create tokens from the dashboard screen.
+ 
+ Header: Authorization Bearer {token}
+```
+
+### 4. Testing
 ```bash
 docker-compose exec backend composer test
 # inclueded static code analysis and tests
 ```
 
-### 4. API Documentation
+### 5. API Documentation
 ```bash
 [POST] http://localhost:8080/api/v1/blogs
 [GET] http://localhost:8080/api/v1/blogs
@@ -56,4 +66,3 @@ docker-compose exec backend composer test
 [PUT] http://localhost:8080/api/v1/blogs/{id}/comments/{id}
 [DELETE] http://localhost:8080/api/v1/blogs/{id}/comments/{id}
 ```
-
