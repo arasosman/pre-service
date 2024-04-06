@@ -1,0 +1,42 @@
+version: "3"
+
+networks:
+  pri-service:
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile-swoole
+    restart: always
+    ports:
+      - "8080:80"
+    volumes:
+      - ./backend:/usr/share/nginx/html
+    depends_on:
+      - redis
+      - mariadb
+    networks:
+      - pri-service
+
+  mariadb:
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_USER: "backend"
+      MYSQL_PASSWORD: "backend"
+      MYSQL_DATABASE: "backend"
+    ports:
+      - "3306:3306"
+    networks:
+      - pri-service
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data/redis:/data
+    command: redis-server --appendonly yes
+    networks:
+      - pri-service

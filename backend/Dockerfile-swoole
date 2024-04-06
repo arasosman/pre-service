@@ -1,0 +1,19 @@
+FROM aras5033/swoole-8.2
+
+RUN apt-get update && apt-get install -y sudo
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+RUN sudo apt-get install -y nodejs
+
+ADD . /usr/share/nginx/html
+
+WORKDIR /usr/share/nginx/html
+
+RUN usermod -a -G www-data root
+RUN chgrp -R www-data storage
+
+RUN chown -R www-data:www-data ./storage
+RUN chmod -R 0777 ./storage
+
+EXPOSE 80
+
+CMD composer install && cp .env.example .env -u && npm install --save-dev chokidar && php artisan octane:start --watch --server=swoole --host=0.0.0.0 --port 80
