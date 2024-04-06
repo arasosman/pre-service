@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Blog;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -50,5 +51,103 @@ class BlogTest extends TestCase
                     'updated_at',
                 ],
             ]);
+    }
+
+    public function test_show_blog()
+    {
+        $user = User::factory()->create();
+        $blog = Blog::factory()->for($user)->createQuietly();
+
+        $this
+            ->actingAs($user)
+            ->withHeaders([
+                'Accept' => 'application/json',
+            ])
+            ->get("/api/v1/blogs/{$blog->id}")
+            ->assertSuccessful()
+            ->assertJsonPath('data.title', $blog->title)
+            ->assertJsonPath('data.content', $blog->content)
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'user_id',
+                    'title',
+                    'content',
+                    'created_at',
+                    'updated_at',
+                ],
+            ]);
+    }
+
+    public function test_blog_index()
+    {
+        $user = User::factory()->create();
+
+        $blogs = Blog::factory()->count(5)->for($user)->createQuietly();
+
+        $this
+            ->actingAs($user)
+            ->withHeaders([
+                'Accept' => 'application/json',
+            ])
+            ->get('/api/v1/blogs')
+            ->assertSuccessful()
+            ->assertJsonCount(5, 'data')
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'id',
+                        'user_id',
+                        'title',
+                        'content',
+                        'created_at',
+                        'updated_at',
+                    ],
+                ],
+            ]);
+    }
+
+    public function test_update_blog()
+    {
+        $user = User::factory()->create();
+        $blog = Blog::factory()->for($user)->createQuietly();
+
+        $this
+            ->actingAs($user)
+            ->withHeaders([
+                'Accept' => 'application/json',
+            ])
+            ->putJson("/api/v1/blogs/{$blog->id}", [
+                'title' => 'Updated Blog',
+                'content' => 'Updated Content',
+            ])
+            ->assertSuccessful()
+            ->assertJsonPath('data.title', 'Updated Blog')
+            ->assertJsonPath('data.content', 'Updated Content')
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'user_id',
+                    'title',
+                    'content',
+                    'created_at',
+                    'updated_at',
+                ],
+            ]);
+    }
+
+    public function test_delete_blog()
+    {
+        $user = User::factory()->create();
+        $blog = Blog::factory()->for($user)->createQuietly();
+
+        $this
+            ->actingAs($user)
+            ->withHeaders([
+                'Accept' => 'application/json',
+            ])
+            ->delete("/api/v1/blogs/{$blog->id}")
+            ->assertSuccessful()
+            ->assertJson(['message' => 'Blog deleted successfully']);
     }
 }
