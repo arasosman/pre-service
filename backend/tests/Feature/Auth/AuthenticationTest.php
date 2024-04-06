@@ -51,4 +51,32 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
         $response->assertRedirect('/');
     }
+
+    public function test_api_user()
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->get('/api/v1/user')
+            ->assertSuccessful();
+    }
+
+    public function test_api_create_token()
+    {
+        $user = User::factory()->create();
+
+        $token = $this->actingAs($user)
+            ->post('/api/v1/tokens/create')
+            ->assertSuccessful()
+            ->assertJsonStructure(['token'])
+            ->json('token');
+
+        $this->withToken($token)
+            ->get('/api/v1/user')
+            ->assertSuccessful()
+            ->assertJsonStructure([
+                'name',
+                'email',
+            ]);
+    }
 }

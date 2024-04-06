@@ -13,7 +13,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $content
  * @property-read Comment[] $comments
  * @property-read User $user
- *
  */
 class Blog extends Model
 {

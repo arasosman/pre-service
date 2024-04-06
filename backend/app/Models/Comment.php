@@ -15,7 +15,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $comment
  * @property-read Blog $blog
  * @property-read User $user
- *
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
