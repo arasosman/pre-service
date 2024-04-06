@@ -9,7 +9,6 @@ use Tests\TestCase;
 
 class BlogTest extends TestCase
 {
-
     use RefreshDatabase;
 
     /**
