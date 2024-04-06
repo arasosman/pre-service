@@ -78,6 +78,38 @@ class BlogTest extends TestCase
             ]);
     }
 
+    public function test_show_blog_with_token()
+    {
+        $user = User::factory()->create();
+        $blog = Blog::factory()->for($user)->createQuietly();
+
+        $token = $this->actingAs($user)
+            ->post('/api/v1/tokens/create')
+            ->assertSuccessful()
+            ->assertJsonStructure(['token'])
+            ->json('token');
+
+        $this
+            ->withToken($token)
+            ->withHeaders([
+                'Accept' => 'application/json',
+            ])
+            ->get("/api/v1/blogs/{$blog->id}")
+            ->assertSuccessful()
+            ->assertJsonPath('data.title', $blog->title)
+            ->assertJsonPath('data.content', $blog->content)
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'user_id',
+                    'title',
+                    'content',
+                    'created_at',
+                    'updated_at',
+                ],
+            ]);
+    }
+
     public function test_blog_index()
     {
         $user = User::factory()->create();

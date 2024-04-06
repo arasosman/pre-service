@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Observers\CommentObserver;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,13 +13,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $blog_id
  * @property int $user_id
- * @property string $title
  * @property string $comment
  * @property-read Blog $blog
  * @property-read User $user
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
+#[ObservedBy([CommentObserver::class])]
 class Comment extends Model
 {
     use HasFactory;
@@ -25,7 +27,6 @@ class Comment extends Model
     protected $fillable = [
         'blog_id',
         'user_id',
-        'title',
         'comment',
     ];
 
