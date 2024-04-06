@@ -8,6 +8,7 @@ use App\Http\Resources\Blog\BlogResource;
 use App\Http\Services\BlogService;
 use App\Models\Blog;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Gate;
 
 class BlogController extends Controller
 {
@@ -16,6 +17,7 @@ class BlogController extends Controller
      */
     public function index(BlogRequest $request, BlogService $service): JsonResponse
     {
+        Gate::authorize('viewAny', Blog::class);
         $blogs = $service->index($request);
 
         return BlogResource::collection($blogs)->response();
@@ -26,6 +28,7 @@ class BlogController extends Controller
      */
     public function store(BlogStoreRequest $request, BlogService $service): JsonResponse
     {
+        Gate::authorize('create', Blog::class);
         $blog = $service->create($request);
 
         return BlogResource::make($blog)->response();
@@ -36,6 +39,8 @@ class BlogController extends Controller
      */
     public function show(Blog $blog): JsonResponse
     {
+        Gate::authorize('view', $blog);
+
         return BlogResource::make($blog)->response();
     }
 
@@ -44,6 +49,7 @@ class BlogController extends Controller
      */
     public function update(BlogRequest $request, Blog $blog, BlogService $service): JsonResponse
     {
+        Gate::authorize('update', $blog);
         $blog = $service->update($request, $blog);
 
         return BlogResource::make($blog)->response();
@@ -54,6 +60,7 @@ class BlogController extends Controller
      */
     public function destroy(Blog $blog, BlogService $service): JsonResponse
     {
+        Gate::authorize('delete', $blog);
         $service->delete($blog);
 
         return response()->json(['message' => 'Blog deleted successfully']);

@@ -82,7 +82,7 @@ class BlogTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $blogs = Blog::factory()->count(5)->for($user)->createQuietly();
+        Blog::factory()->count(5)->for($user)->createQuietly();
 
         $this
             ->actingAs($user)
@@ -133,6 +133,38 @@ class BlogTest extends TestCase
                     'updated_at',
                 ],
             ]);
+    }
+
+    public function test_update_blog_you_dont_own()
+    {
+        $user = User::factory()->create();
+        $blog = Blog::factory()->for($user)->createQuietly();
+        $user2 = User::factory()->create();
+
+        $this
+            ->actingAs($user2)
+            ->withHeaders([
+                'Accept' => 'application/json',
+            ])
+            ->putJson("/api/v1/blogs/{$blog->id}", [
+                'title' => 'Updated Blog',
+            ])
+            ->assertForbidden();
+    }
+
+    public function test_delete_blog_you_dont_own()
+    {
+        $user = User::factory()->create();
+        $blog = Blog::factory()->for($user)->createQuietly();
+        $user2 = User::factory()->create();
+
+        $this
+            ->actingAs($user2)
+            ->withHeaders([
+                'Accept' => 'application/json',
+            ])
+            ->delete("/api/v1/blogs/{$blog->id}")
+            ->assertForbidden();
     }
 
     public function test_delete_blog()
